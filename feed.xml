@@ -26,6 +26,23 @@
       <description>产品设计</description>
     </item>
     <item>
+      <title>Agent Skill Skill</title>
+      <link>https://odetteisgorgeous.gitee.io/blogs/posts/agent-skill.html</link>
+      <guid isPermaLink="true">https://odetteisgorgeous.gitee.io/blogs/posts/agent-skill.html</guid>
+      <pubDate>Sun, 13 Sep 2026 00:00:00 GMT</pubDate>
+      <category>Agent Skill</category>
+      <description>Agent Skill使用原理。</description>
+    </item>
+    <item>
+      <title>Agent的ReAct,Plan-And-Execute模式</title>
+      <link>https://odetteisgorgeous.gitee.io/blogs/posts/agent的reAct和plan-and-execute模式.html</link>
+      <guid isPermaLink="true">https://odetteisgorgeous.gitee.io/blogs/posts/agent的reAct和plan-and-execute模式.html</guid>
+      <pubDate>Sun, 13 Sep 2026 00:00:00 GMT</pubDate>
+      <category>ReAct</category>
+      <category>Plan-And-Execute</category>
+      <description>Agent。</description>
+    </item>
+    <item>
       <title>G1 调参实战：从 200ms 停顿到 40ms</title>
       <link>https://odetteisgorgeous.gitee.io/blogs/posts/jvm-g1-tuning.html</link>
       <guid isPermaLink="true">https://odetteisgorgeous.gitee.io/blogs/posts/jvm-g1-tuning.html</guid>
