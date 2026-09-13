@@ -3,12 +3,12 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Odette 的博客 · 后端开发 / Java / 分布式</title>
+  <title>Odette 的博客 · 后端开发 / Java / 分布式 / LLM</title>
   <meta name="description" content="记录后端开发路上的思考与实践：Java、分布式系统、数据库与中间件。" />
   <meta name="author" content="Odette" />
   <link rel="canonical" href="https://odetteisgorgeous.gitee.io/blogs/index.html" />
   <meta property="og:site_name" content="Odette 的博客" />
-  <meta property="og:title" content="Odette 的博客 · 后端开发 / Java / 分布式" />
+  <meta property="og:title" content="Odette 的博客 · 后端开发 / Java / 分布式 / LLM" />
   <meta property="og:description" content="记录后端开发路上的思考与实践：Java、分布式系统、数据库与中间件。" />
   <meta property="og:type" content="website" />
   <meta property="og:url" content="https://odetteisgorgeous.gitee.io/blogs/index.html" />
@@ -39,7 +39,7 @@
         <span class="brand-mark" aria-hidden="true">O</span>
         <span class="brand-text">
           <strong>Odette 的博客</strong>
-          <em>后端开发 / Java / 分布式</em>
+          <em>后端开发 / Java / 分布式 / LLM</em>
         </span>
       </a>
 
@@ -88,7 +88,7 @@
       <img class="hero-avatar" src="assets/img/avatar.svg" alt="Odette 的头像" width="104" height="104" />
       <div class="hero-text">
         <h1>你好，我是 Odette</h1>
-        <p>这里记录我在 Java 后端、分布式系统与中间件上踩过的坑，以及想明白的那些事。文章尽量讲清「为什么」和「怎么做」，而不只是贴一个结论。</p>
+        <p>这里记录我在 Java 后端、分布式系统与中间件以及大模型上踩过的坑，以及想明白的那些事。文章尽量讲清「为什么」和「怎么做」，而不只是贴一个结论。</p>
         <p class="hero-actions">
           <a class="btn btn-primary" href="archive.html">浏览全部文章</a>
           <a class="btn" href="feed.xml">订阅 RSS</a>
@@ -107,19 +107,9 @@
         <div class="card-meta">
           <time datetime="2026-09-13">2026-09-13</time>
           <span aria-hidden="true">·</span>
-          <span>2 分钟阅读</span>
-        </div>
-        <h3 class="card-title"><a href="posts/hello-world.html">开博第一篇：这个博客写什么</a></h3>
-        <p class="card-summary">在官方文档、AI 助手和问答社区都很发达的 2026 年，为什么还要自己搭一个静态博客？这篇说说我的理由，以及这里准备写哪些内容。</p>
-        <ul class="card-tags"><li><a class="tag" href="tags.html#tag-随笔">#随笔</a></li><li><a class="tag" href="tags.html#tag-博客">#博客</a></li></ul>
-      </article>
-      <article class="post-card">
-        <div class="card-meta">
-          <time datetime="2026-09-13">2026-09-13</time>
-          <span aria-hidden="true">·</span>
           <span>1 分钟阅读</span>
         </div>
-        <h3 class="card-title"><a href="posts/怎样用AI做好产品.html">开博第一篇：这个博客写什么</a></h3>
+        <h3 class="card-title"><a href="posts/怎样用AI做好产品.html">怎么使用AI工具设计产品</a></h3>
         <p class="card-summary">产品设计</p>
         <ul class="card-tags"><li><a class="tag" href="tags.html#tag-ai">#AI</a></li><li><a class="tag" href="tags.html#tag-产品设计">#产品设计</a></li></ul>
       </article>
@@ -143,26 +133,6 @@
         <p class="card-summary">Agent。</p>
         <ul class="card-tags"><li><a class="tag" href="tags.html#tag-react">#ReAct</a></li><li><a class="tag" href="tags.html#tag-plan-and-execute">#Plan-And-Execute</a></li></ul>
       </article>
-      <article class="post-card">
-        <div class="card-meta">
-          <time datetime="2026-08-24">2026-08-24</time>
-          <span aria-hidden="true">·</span>
-          <span>2 分钟阅读</span>
-        </div>
-        <h3 class="card-title"><a href="posts/jvm-g1-tuning.html">G1 调参实战：从 200ms 停顿到 40ms</a></h3>
-        <p class="card-summary">一次把服务端 G1 的 Young GC 停顿从 200ms 压到 40ms 的过程：先看日志，再定 Region 大小，最后才动参数。</p>
-        <ul class="card-tags"><li><a class="tag" href="tags.html#tag-java">#Java</a></li><li><a class="tag" href="tags.html#tag-jvm">#JVM</a></li><li><a class="tag" href="tags.html#tag-性能">#性能</a></li></ul>
-      </article>
-      <article class="post-card">
-        <div class="card-meta">
-          <time datetime="2026-07-19">2026-07-19</time>
-          <span aria-hidden="true">·</span>
-          <span>3 分钟阅读</span>
-        </div>
-        <h3 class="card-title"><a href="posts/kafka-no-loss.html">Kafka 不丢不重的实践清单</a></h3>
-        <p class="card-summary">从生产者、Broker 到消费者，把&quot;消息不丢&quot;和&quot;消息不重&quot;拆成可以逐条检查的清单，并说明为什么端到端恰好一次往往要落到业务幂等上。</p>
-        <ul class="card-tags"><li><a class="tag" href="tags.html#tag-kafka">#Kafka</a></li><li><a class="tag" href="tags.html#tag-分布式">#分布式</a></li><li><a class="tag" href="tags.html#tag-消息队列">#消息队列</a></li></ul>
-      </article>
     </div>
     <p class="more-link"><a href="archive.html">查看全部文章 →</a></p>
   </section>
@@ -176,7 +146,7 @@
         <a href="https://gitee.com/odetteisgorgeous/blogs" target="_blank" rel="noopener noreferrer">Gitee 仓库</a>
         <a href="feed.xml">RSS</a>
         <a href="sitemap.xml">Sitemap</a>
-        <a href="mailto:1207795768@qq.com">邮件</a>
+        <a href="mailto:gp15237125756@126.com">邮件</a>
       </p>
     </div>
   </footer>
