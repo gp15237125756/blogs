@@ -1,0 +1,18 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 208 208" role="img" aria-label="头像">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#eef2ff" />
+      <stop offset="100%" stop-color="#cffafe" />
+    </linearGradient>
+    <linearGradient id="fg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#4f46e5" />
+      <stop offset="100%" stop-color="#06b6d4" />
+    </linearGradient>
+  </defs>
+  <rect width="208" height="208" rx="44" fill="url(#bg)" />
+  <circle cx="104" cy="82" r="34" fill="url(#fg)" opacity="0.92" />
+  <path d="M104 124c-33 0-58 20-62 48a6 6 0 0 0 6 7h112a6 6 0 0 0 6-7c-4-28-29-48-62-48z"
+        fill="url(#fg)" opacity="0.85" />
+  <path d="M148 44l3.4 8.1 8.6 1-6.4 5.9 1.8 8.5-7.4-4.4-7.4 4.4 1.8-8.5-6.4-5.9 8.6-1z"
+        fill="#22d3ee" opacity="0.9" />
+</svg>

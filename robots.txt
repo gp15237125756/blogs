@@ -1,0 +1,4 @@
+User-agent: *
+Allow: /
+
+Sitemap: https://odetteisgorgeous.gitee.io/blogs/sitemap.xml

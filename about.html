@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>关于 · Odette 的博客</title>
+  <meta name="description" content="关于 Odette。" />
+  <meta name="author" content="Odette" />
+  <link rel="canonical" href="https://odetteisgorgeous.gitee.io/blogs/about.html" />
+  <meta property="og:site_name" content="Odette 的博客" />
+  <meta property="og:title" content="关于 · Odette 的博客" />
+  <meta property="og:description" content="关于 Odette。" />
+  <meta property="og:type" content="website" />
+  <meta property="og:url" content="https://odetteisgorgeous.gitee.io/blogs/about.html" />
+  <meta name="twitter:card" content="summary" />
+  <meta name="theme-color" content="#f7f8fb" media="(prefers-color-scheme: light)" />
+  <meta name="theme-color" content="#0e1116" media="(prefers-color-scheme: dark)" />
+  <link rel="icon" href="assets/img/favicon.svg" type="image/svg+xml" />
+  <link rel="alternate" type="application/rss+xml" title="Odette 的博客" href="feed.xml" />
+  <link rel="stylesheet" href="assets/css/style.css" />
+  <script>
+    (function () {
+      try {
+        var stored = localStorage.getItem('blog-theme');
+        var theme = stored || (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light');
+        document.documentElement.setAttribute('data-theme', theme);
+      } catch (e) { /* 忽略隐私模式下的异常 */ }
+    })();
+  </script>
+</head>
+<body>
+  <a class="skip-link" href="#main">跳到正文</a>
+
+  <div class="reading-progress" id="reading-progress" hidden></div>
+
+  <header class="site-header">
+    <div class="wrap header-inner">
+      <a class="brand" href="index.html">
+        <span class="brand-mark" aria-hidden="true">O</span>
+        <span class="brand-text">
+          <strong>Odette 的博客</strong>
+          <em>后端开发 / Java / 分布式</em>
+        </span>
+      </a>
+
+      <button class="nav-toggle" type="button" aria-expanded="false" aria-controls="site-nav" aria-label="展开菜单">
+        <span></span><span></span><span></span>
+      </button>
+
+      <nav class="site-nav" id="site-nav" aria-label="主导航">
+        <a class="nav-link" href="index.html">首页</a>
+        <a class="nav-link" href="archive.html">归档</a>
+        <a class="nav-link" href="tags.html">标签</a>
+        <a class="nav-link is-active" href="about.html">关于</a>
+        <span class="nav-actions">
+          <button class="icon-btn js-search-open" type="button" aria-label="搜索文章（快捷键 /）" title="搜索文章（/）">
+            <svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true">
+              <circle cx="11" cy="11" r="6.5" fill="none" stroke="currentColor" stroke-width="1.8" />
+              <line x1="16" y1="16" x2="21" y2="21" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" />
+            </svg>
+          </button>
+          <button class="icon-btn js-theme-toggle" type="button" aria-label="切换深浅色主题" title="切换主题">
+            <svg class="icon-sun" viewBox="0 0 24 24" width="18" height="18" aria-hidden="true">
+              <circle cx="12" cy="12" r="4.2" fill="none" stroke="currentColor" stroke-width="1.8" />
+              <g stroke="currentColor" stroke-width="1.8" stroke-linecap="round">
+                <line x1="12" y1="2.5" x2="12" y2="5" />
+                <line x1="12" y1="19" x2="12" y2="21.5" />
+                <line x1="2.5" y1="12" x2="5" y2="12" />
+                <line x1="19" y1="12" x2="21.5" y2="12" />
+                <line x1="5.3" y1="5.3" x2="7" y2="7" />
+                <line x1="17" y1="17" x2="18.7" y2="18.7" />
+                <line x1="5.3" y1="18.7" x2="7" y2="17" />
+                <line x1="17" y1="7" x2="18.7" y2="5.3" />
+              </g>
+            </svg>
+            <svg class="icon-moon" viewBox="0 0 24 24" width="18" height="18" aria-hidden="true">
+              <path d="M20 14.2A8.2 8.2 0 0 1 9.8 4a8.5 8.5 0 1 0 10.2 10.2z" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round" />
+            </svg>
+          </button>
+        </span>
+      </nav>
+    </div>
+  </header>
+
+  <main id="main">
+  <div class="wrap page">
+    <header class="page-header">
+      <h1>关于</h1>
+      <p class="page-desc">关于 Odette</p>
+    </header>
+    <div class="page-body">
+<img class="about-avatar" src="assets/img/avatar.svg" alt="Odette 的头像" width="116" height="116" />
+<h2 id="我是谁">我是谁<a class="anchor" href="#我是谁" aria-hidden="true">#</a></h2>
+<p>一名后端开发工程师，日常工作围绕 Java、Spring 生态、分布式中间件和数据库展开。写过业务系统，也做过数据同步、分库分表和性能优化。</p>
+<p>这个博客是我的技术笔记本：把排查问题的过程、方案的取舍理由，以及踩过的坑记录下来。</p>
+<h2 id="技术栈">技术栈<a class="anchor" href="#技术栈" aria-hidden="true">#</a></h2>
+<div class="code-block" data-lang="text"><pre><code class="language-text">语言     Java / Scala / TypeScript / Shell
+框架     Spring Boot、Spring Cloud、MyBatis、Dubbo、Netty
+存储     MySQL、Redis、Kafka、Elasticsearch
+中间件   ShardingSphere、XXL-JOB、Apollo
+运维     Docker、Kubernetes、Prometheus、Grafana</code></pre></div>
+<h2 id="写作原则">写作原则<a class="anchor" href="#写作原则" aria-hidden="true">#</a></h2>
+<ol><li><strong>能复现才写</strong>：涉及参数和命令的地方给出可执行的内容</li><li><strong>讲清取舍</strong>：不只说结论，也说为什么排除了其他方案</li><li><strong>保持更新</strong>：技术会过时，发现旧文有误会直接修订并标注</li></ol>
+<h2 id="联系方式">联系方式<a class="anchor" href="#联系方式" aria-hidden="true">#</a></h2>
+<ul><li>Gitee：<a href="https://gitee.com/odetteisgorgeous" target="_blank" rel="noopener noreferrer">https://gitee.com/odetteisgorgeous</a></li><li>邮箱：1207795768@qq.com</li><li>RSS：<a href="../feed.xml">feed.xml</a></li></ul>
+<p>如果文章对你有帮助，或者发现了错误，欢迎通过 Issue 告诉我。</p>
+<h2 id="关于本站">关于本站<a class="anchor" href="#关于本站" aria-hidden="true">#</a></h2>
+<p>本站是一个零依赖的静态站点：Markdown 写文章，Node.js 脚本生成 HTML，托管在 Gitee Pages。</p>
+<p>并没有引入任何框架或 npm 依赖，构建脚本全部代码都在仓库的 <code>scripts/build.mjs</code> 里，方便随时改动。</p>
+<p>主题、排版与配色都保持简洁，支持深浅色模式与站内搜索，尽量让阅读本身不被打扰。</p>
+    </div>
+  </div>
+
+  </main>
+
+  <footer class="site-footer">
+    <div class="wrap footer-inner">
+      <p class="footer-copy">© <span id="footer-year">2026</span> Odette · 由 zero-dep 静态生成器驱动</p>
+      <p class="footer-links">
+        <a href="https://gitee.com/odetteisgorgeous/blogs" target="_blank" rel="noopener noreferrer">Gitee 仓库</a>
+        <a href="feed.xml">RSS</a>
+        <a href="sitemap.xml">Sitemap</a>
+        <a href="mailto:1207795768@qq.com">邮件</a>
+      </p>
+    </div>
+  </footer>
+
+  <button class="back-to-top js-back-to-top" type="button" aria-label="回到顶部" title="回到顶部" hidden>
+    <svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true">
+      <path d="M6 14l6-6 6 6" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
+    </svg>
+  </button>
+
+  <div class="search-modal" id="search-modal" hidden>
+    <div class="search-backdrop js-search-close"></div>
+    <div class="search-panel" role="dialog" aria-modal="true" aria-label="搜索文章">
+      <div class="search-head">
+        <svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true">
+          <circle cx="11" cy="11" r="6.5" fill="none" stroke="currentColor" stroke-width="1.8" />
+          <line x1="16" y1="16" x2="21" y2="21" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" />
+        </svg>
+        <input id="search-input" type="search" placeholder="搜索标题、标签或正文…" autocomplete="off" spellcheck="false" />
+        <kbd>Esc</kbd>
+      </div>
+      <ul class="search-results" id="search-results"></ul>
+      <p class="search-hint" id="search-hint">输入关键词开始搜索</p>
+    </div>
+  </div>
+
+  <script src="assets/js/main.js" defer></script>
+</body>
+</html>

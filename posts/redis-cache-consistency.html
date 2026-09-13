@@ -1,0 +1,223 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>缓存与数据库一致性的四种方案 · Odette 的博客</title>
+  <meta name="description" content="先删缓存还是先更新数据库？延迟双删到底能不能解决问题？把四种常见方案的失效场景摊开看，结论会清晰很多。" />
+  <meta name="author" content="Odette" />
+  <link rel="canonical" href="https://odetteisgorgeous.gitee.io/blogs/posts/redis-cache-consistency.html" />
+  <meta property="og:site_name" content="Odette 的博客" />
+  <meta property="og:title" content="缓存与数据库一致性的四种方案 · Odette 的博客" />
+  <meta property="og:description" content="先删缓存还是先更新数据库？延迟双删到底能不能解决问题？把四种常见方案的失效场景摊开看，结论会清晰很多。" />
+  <meta property="og:type" content="article" />
+  <meta property="og:url" content="https://odetteisgorgeous.gitee.io/blogs/posts/redis-cache-consistency.html" />
+  <meta name="twitter:card" content="summary" />
+  <meta name="theme-color" content="#f7f8fb" media="(prefers-color-scheme: light)" />
+  <meta name="theme-color" content="#0e1116" media="(prefers-color-scheme: dark)" />
+  <link rel="icon" href="../assets/img/favicon.svg" type="image/svg+xml" />
+  <link rel="alternate" type="application/rss+xml" title="Odette 的博客" href="../feed.xml" />
+  <link rel="stylesheet" href="../assets/css/style.css" />
+  <script>
+    (function () {
+      try {
+        var stored = localStorage.getItem('blog-theme');
+        var theme = stored || (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light');
+        document.documentElement.setAttribute('data-theme', theme);
+      } catch (e) { /* 忽略隐私模式下的异常 */ }
+    })();
+  </script>
+</head>
+<body>
+  <a class="skip-link" href="#main">跳到正文</a>
+
+  <div class="reading-progress" id="reading-progress" hidden></div>
+
+  <header class="site-header">
+    <div class="wrap header-inner">
+      <a class="brand" href="../index.html">
+        <span class="brand-mark" aria-hidden="true">O</span>
+        <span class="brand-text">
+          <strong>Odette 的博客</strong>
+          <em>后端开发 / Java / 分布式</em>
+        </span>
+      </a>
+
+      <button class="nav-toggle" type="button" aria-expanded="false" aria-controls="site-nav" aria-label="展开菜单">
+        <span></span><span></span><span></span>
+      </button>
+
+      <nav class="site-nav" id="site-nav" aria-label="主导航">
+        <a class="nav-link is-active" href="../index.html">首页</a>
+        <a class="nav-link" href="../archive.html">归档</a>
+        <a class="nav-link" href="../tags.html">标签</a>
+        <a class="nav-link" href="../about.html">关于</a>
+        <span class="nav-actions">
+          <button class="icon-btn js-search-open" type="button" aria-label="搜索文章（快捷键 /）" title="搜索文章（/）">
+            <svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true">
+              <circle cx="11" cy="11" r="6.5" fill="none" stroke="currentColor" stroke-width="1.8" />
+              <line x1="16" y1="16" x2="21" y2="21" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" />
+            </svg>
+          </button>
+          <button class="icon-btn js-theme-toggle" type="button" aria-label="切换深浅色主题" title="切换主题">
+            <svg class="icon-sun" viewBox="0 0 24 24" width="18" height="18" aria-hidden="true">
+              <circle cx="12" cy="12" r="4.2" fill="none" stroke="currentColor" stroke-width="1.8" />
+              <g stroke="currentColor" stroke-width="1.8" stroke-linecap="round">
+                <line x1="12" y1="2.5" x2="12" y2="5" />
+                <line x1="12" y1="19" x2="12" y2="21.5" />
+                <line x1="2.5" y1="12" x2="5" y2="12" />
+                <line x1="19" y1="12" x2="21.5" y2="12" />
+                <line x1="5.3" y1="5.3" x2="7" y2="7" />
+                <line x1="17" y1="17" x2="18.7" y2="18.7" />
+                <line x1="5.3" y1="18.7" x2="7" y2="17" />
+                <line x1="17" y1="7" x2="18.7" y2="5.3" />
+              </g>
+            </svg>
+            <svg class="icon-moon" viewBox="0 0 24 24" width="18" height="18" aria-hidden="true">
+              <path d="M20 14.2A8.2 8.2 0 0 1 9.8 4a8.5 8.5 0 1 0 10.2 10.2z" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round" />
+            </svg>
+          </button>
+        </span>
+      </nav>
+    </div>
+  </header>
+
+  <main id="main">
+  <div class="wrap post-layout">
+    <article class="post">
+      <header class="post-header">
+        <p class="post-meta">
+          <time datetime="2026-04-12">2026-04-12</time>
+          <span class="sep">·</span>
+          <span>3 分钟阅读</span>
+        </p>
+        <h1 class="post-title">缓存与数据库一致性的四种方案</h1>
+        <p class="post-summary">先删缓存还是先更新数据库？延迟双删到底能不能解决问题？把四种常见方案的失效场景摊开看，结论会清晰很多。</p>
+        <ul class="tag-list">
+          <li><a class="tag" href="../tags.html#tag-redis">#Redis</a></li>
+          <li><a class="tag" href="../tags.html#tag-缓存">#缓存</a></li>
+          <li><a class="tag" href="../tags.html#tag-分布式">#分布式</a></li>
+        </ul>
+      </header>
+
+      <div class="post-body" id="post-body">
+<h2 id="问题本质">问题本质<a class="anchor" href="#问题本质" aria-hidden="true">#</a></h2>
+<p>缓存和数据库是两个存储，任何&quot;先操作 A、再操作 B&quot;的顺序都会有一个中间窗口，窗口内两者不一致。所以真正的问题不是&quot;如何消除不一致&quot;，而是<strong>把不一致窗口压到能接受的范围</strong>。</p>
+<h2 id="方案一先更新数据库再删除缓存">方案一：先更新数据库，再删除缓存<a class="anchor" href="#方案一先更新数据库再删除缓存" aria-hidden="true">#</a></h2>
+<p>也就是常说的 Cache Aside。绝大多数场景下这是<strong>默认选择</strong>。</p>
+<p>并发下仍有极小概率出错：</p>
+<div class="code-block" data-lang="text"><pre><code class="language-text">T1: 读请求，缓存未命中
+T2: 读请求，从 DB 读到旧值 v1
+T1: 写请求，更新 DB 为 v2，删除缓存
+T2: 把 v1 写入缓存        ← 缓存里留下了旧值</code></pre></div>
+<p>这个窗口出现的条件是&quot;读请求恰好在写请求删缓存之后才写回缓存&quot;，概率低但存在。缓解方式：</p>
+<div class="code-block" data-lang="java"><pre><code class="language-java">// 写回的缓存加一个较短的过期时间兜底
+redis.set(key, value, 60, TimeUnit.SECONDS);</code></pre></div>
+<h2 id="方案二延迟双删">方案二：延迟双删<a class="anchor" href="#方案二延迟双删" aria-hidden="true">#</a></h2>
+<p>更新数据库后，先删一次缓存，延迟几百毫秒再删一次。</p>
+<div class="code-block" data-lang="java"><pre><code class="language-java">public void update(Item item) {
+    itemMapper.updateById(item);
+    redis.delete(key(item.getId()));
+    // 延迟删除，等待可能存在的旧值回填完成
+    executor.schedule(() -&gt; redis.delete(key(item.getId())), 500, TimeUnit.MILLISECONDS);
+}</code></pre></div>
+<p><strong>它的效果取决于延迟时间是否大于读请求的耗时</strong>，而这个耗时不可控。更稳妥的做法是让更新方在删缓存后等待所有在途读请求结束，但代价是复杂度上升。</p>
+<p>结论：延迟双删可以缓解，不能根治。</p>
+<h2 id="方案三先删除缓存再更新数据库">方案三：先删除缓存，再更新数据库<a class="anchor" href="#方案三先删除缓存再更新数据库" aria-hidden="true">#</a></h2>
+<p>这个顺序的问题更大：</p>
+<div class="code-block" data-lang="text"><pre><code class="language-text">T1: 写请求，删除缓存
+T2: 读请求，缓存未命中，从 DB 读到旧值 v1，写回缓存
+T1: 更新 DB 为 v2                    ← 缓存里是 v1，DB 里是 v2</code></pre></div>
+<p>不一致窗口比方案一更长，所以<strong>不推荐</strong>。</p>
+<h2 id="方案四订阅-binlog-异步刷新">方案四：订阅 Binlog 异步刷新<a class="anchor" href="#方案四订阅-binlog-异步刷新" aria-hidden="true">#</a></h2>
+<p>用 Canal / Debezium 订阅数据库变更，异步删除或更新缓存。</p>
+<p>优点：</p>
+<ul><li>业务代码不感知缓存，解耦彻底</li><li>缓存操作可以串行化，避免并发乱序</li></ul>
+<p>缺点：</p>
+<ul><li>引入额外组件，链路更长</li><li>存在秒级延迟，不适合强一致场景</li></ul>
+<p>这个方案适合缓存数据量大、业务代码难以统一改动的系统。</p>
+<h2 id="怎么选">怎么选<a class="anchor" href="#怎么选" aria-hidden="true">#</a></h2>
+<table><thead><tr><th>场景</th><th>推荐方案</th></tr></thead><tbody><tr><td>普通商品、用户资料</td><td>先更新 DB 再删缓存 + 过期时间兜底</td></tr><tr><td>更新频率低、读取极频繁</td><td>同上，但把过期时间拉长</td></tr><tr><td>缓存与 DB 需要强一致</td><td>别用缓存，或改用分布式锁串行化</td></tr><tr><td>大量历史代码难以改造</td><td>Binlog 异步刷新</td></tr></tbody></table>
+<h2 id="两个容易忽略的细节">两个容易忽略的细节<a class="anchor" href="#两个容易忽略的细节" aria-hidden="true">#</a></h2>
+<p><strong>缓存穿透</strong>：查询不存在的 key 会直接打到 DB。用空值缓存或布隆过滤器兜住。</p>
+<div class="code-block" data-lang="java"><pre><code class="language-java">// 空值也缓存，但过期时间要短
+if (item == null) {
+    redis.set(key, &quot;NULL&quot;, 60, TimeUnit.SECONDS);
+    return null;
+}</code></pre></div>
+<p><strong>热点 key 失效</strong>：大批 key 同时过期会造成 DB 尖峰。给过期时间加随机抖动：</p>
+<div class="code-block" data-lang="java"><pre><code class="language-java">int ttl = 300 + ThreadLocalRandom.current().nextInt(60);
+redis.set(key, value, ttl, TimeUnit.SECONDS);</code></pre></div>
+<h2 id="小结">小结<a class="anchor" href="#小结" aria-hidden="true">#</a></h2>
+<p>缓存一致性没有银弹。<strong>承认存在不一致窗口，然后用过期时间和兜底逻辑把影响控制住</strong>，比追求&quot;绝对一致&quot;更现实。</p>
+<p>如果业务真的不能容忍任何不一致，那首先要质疑的应该是：这份数据真的需要放进缓存吗？</p>
+      </div>
+
+      <footer class="post-footer">
+        <p class="post-copyright">
+          本文由 Odette 创作，采用
+          <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/deed.zh" target="_blank" rel="noopener noreferrer">CC BY-NC-SA 4.0</a>
+          许可协议。转载请注明出处。
+        </p>
+        <nav class="post-nav" aria-label="上下篇导航">
+          <a class="nav-prev" href="../posts/sharding-jdbc-notes.html"><span class="nav-label">← 上一篇</span>ShardingSphere-JDBC 分库分表踩坑记录</a>
+        </nav>
+      </footer>
+    </article>
+
+    <aside class="post-aside">
+      <nav class="toc" aria-label="文章目录">
+        <p class="toc-title">目录</p>
+        <ul>
+          <li class="toc-lv2"><a href="#问题本质">问题本质</a></li>
+          <li class="toc-lv2"><a href="#方案一先更新数据库再删除缓存">方案一：先更新数据库，再删除缓存</a></li>
+          <li class="toc-lv2"><a href="#方案二延迟双删">方案二：延迟双删</a></li>
+          <li class="toc-lv2"><a href="#方案三先删除缓存再更新数据库">方案三：先删除缓存，再更新数据库</a></li>
+          <li class="toc-lv2"><a href="#方案四订阅-binlog-异步刷新">方案四：订阅 Binlog 异步刷新</a></li>
+          <li class="toc-lv2"><a href="#怎么选">怎么选</a></li>
+          <li class="toc-lv2"><a href="#两个容易忽略的细节">两个容易忽略的细节</a></li>
+          <li class="toc-lv2"><a href="#小结">小结</a></li>
+        </ul>
+      </nav>
+    </aside>
+  </div>
+
+  </main>
+
+  <footer class="site-footer">
+    <div class="wrap footer-inner">
+      <p class="footer-copy">© <span id="footer-year">2026</span> Odette · 由 zero-dep 静态生成器驱动</p>
+      <p class="footer-links">
+        <a href="https://gitee.com/odetteisgorgeous/blogs" target="_blank" rel="noopener noreferrer">Gitee 仓库</a>
+        <a href="../feed.xml">RSS</a>
+        <a href="../sitemap.xml">Sitemap</a>
+        <a href="mailto:1207795768@qq.com">邮件</a>
+      </p>
+    </div>
+  </footer>
+
+  <button class="back-to-top js-back-to-top" type="button" aria-label="回到顶部" title="回到顶部" hidden>
+    <svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true">
+      <path d="M6 14l6-6 6 6" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
+    </svg>
+  </button>
+
+  <div class="search-modal" id="search-modal" hidden>
+    <div class="search-backdrop js-search-close"></div>
+    <div class="search-panel" role="dialog" aria-modal="true" aria-label="搜索文章">
+      <div class="search-head">
+        <svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true">
+          <circle cx="11" cy="11" r="6.5" fill="none" stroke="currentColor" stroke-width="1.8" />
+          <line x1="16" y1="16" x2="21" y2="21" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" />
+        </svg>
+        <input id="search-input" type="search" placeholder="搜索标题、标签或正文…" autocomplete="off" spellcheck="false" />
+        <kbd>Esc</kbd>
+      </div>
+      <ul class="search-results" id="search-results"></ul>
+      <p class="search-hint" id="search-hint">输入关键词开始搜索</p>
+    </div>
+  </div>
+
+  <script src="../assets/js/main.js" defer></script>
+</body>
+</html>

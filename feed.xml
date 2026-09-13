@@ -1,0 +1,70 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>Odette 的博客</title>
+    <link>https://odetteisgorgeous.gitee.io/blogs/</link>
+    <description>记录后端开发路上的思考与实践：Java、分布式系统、数据库与中间件。</description>
+    <language>zh-CN</language>
+    <lastBuildDate>Sun, 13 Sep 2026 00:00:00 GMT</lastBuildDate>
+    <atom:link href="https://odetteisgorgeous.gitee.io/blogs/feed.xml" rel="self" type="application/rss+xml" />
+    <item>
+      <title>开博第一篇：这个博客写什么</title>
+      <link>https://odetteisgorgeous.gitee.io/blogs/posts/hello-world.html</link>
+      <guid isPermaLink="true">https://odetteisgorgeous.gitee.io/blogs/posts/hello-world.html</guid>
+      <pubDate>Sun, 13 Sep 2026 00:00:00 GMT</pubDate>
+      <category>随笔</category>
+      <category>博客</category>
+      <description>在官方文档、AI 助手和问答社区都很发达的 2026 年，为什么还要自己搭一个静态博客？这篇说说我的理由，以及这里准备写哪些内容。</description>
+    </item>
+    <item>
+      <title>G1 调参实战：从 200ms 停顿到 40ms</title>
+      <link>https://odetteisgorgeous.gitee.io/blogs/posts/jvm-g1-tuning.html</link>
+      <guid isPermaLink="true">https://odetteisgorgeous.gitee.io/blogs/posts/jvm-g1-tuning.html</guid>
+      <pubDate>Mon, 24 Aug 2026 00:00:00 GMT</pubDate>
+      <category>Java</category>
+      <category>JVM</category>
+      <category>性能</category>
+      <description>一次把服务端 G1 的 Young GC 停顿从 200ms 压到 40ms 的过程：先看日志，再定 Region 大小，最后才动参数。</description>
+    </item>
+    <item>
+      <title>Kafka 不丢不重的实践清单</title>
+      <link>https://odetteisgorgeous.gitee.io/blogs/posts/kafka-no-loss.html</link>
+      <guid isPermaLink="true">https://odetteisgorgeous.gitee.io/blogs/posts/kafka-no-loss.html</guid>
+      <pubDate>Sun, 19 Jul 2026 00:00:00 GMT</pubDate>
+      <category>Kafka</category>
+      <category>分布式</category>
+      <category>消息队列</category>
+      <description>从生产者、Broker 到消费者，把&quot;消息不丢&quot;和&quot;消息不重&quot;拆成可以逐条检查的清单，并说明为什么端到端恰好一次往往要落到业务幂等上。</description>
+    </item>
+    <item>
+      <title>从 B+ 树聊 MySQL 索引与最左前缀</title>
+      <link>https://odetteisgorgeous.gitee.io/blogs/posts/mysql-leftmost-index.html</link>
+      <guid isPermaLink="true">https://odetteisgorgeous.gitee.io/blogs/posts/mysql-leftmost-index.html</guid>
+      <pubDate>Sun, 21 Jun 2026 00:00:00 GMT</pubDate>
+      <category>MySQL</category>
+      <category>数据库</category>
+      <category>索引</category>
+      <description>与其背&quot;最左前缀原则&quot;，不如搞清楚联合索引在 B+ 树里是怎么排序的。理解了排序规则，索引失效的绝大多数情况都能自己推出来。</description>
+    </item>
+    <item>
+      <title>ShardingSphere-JDBC 分库分表踩坑记录</title>
+      <link>https://odetteisgorgeous.gitee.io/blogs/posts/sharding-jdbc-notes.html</link>
+      <guid isPermaLink="true">https://odetteisgorgeous.gitee.io/blogs/posts/sharding-jdbc-notes.html</guid>
+      <pubDate>Sat, 16 May 2026 00:00:00 GMT</pubDate>
+      <category>分库分表</category>
+      <category>ShardingSphere</category>
+      <category>数据库</category>
+      <description>分片键选择、跨分片查询、分布式主键、事务边界——记录一次从单库迁移到 4 库 8 表的完整过程和五个真实踩过的坑。</description>
+    </item>
+    <item>
+      <title>缓存与数据库一致性的四种方案</title>
+      <link>https://odetteisgorgeous.gitee.io/blogs/posts/redis-cache-consistency.html</link>
+      <guid isPermaLink="true">https://odetteisgorgeous.gitee.io/blogs/posts/redis-cache-consistency.html</guid>
+      <pubDate>Sun, 12 Apr 2026 00:00:00 GMT</pubDate>
+      <category>Redis</category>
+      <category>缓存</category>
+      <category>分布式</category>
+      <description>先删缓存还是先更新数据库？延迟双删到底能不能解决问题？把四种常见方案的失效场景摊开看，结论会清晰很多。</description>
+    </item>
+  </channel>
+</rss>

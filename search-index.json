@@ -1,0 +1,73 @@
+[
+  {
+    "title": "开博第一篇：这个博客写什么",
+    "url": "posts/hello-world.html",
+    "date": "2026-09-13",
+    "tags": [
+      "随笔",
+      "博客"
+    ],
+    "summary": "在官方文档、AI 助手和问答社区都很发达的 2026 年，为什么还要自己搭一个静态博客？这篇说说我的理由，以及这里准备写哪些内容。",
+    "text": "为什么还要写博客# 工作几年之后会发现，真正让人反复踩坑的往往不是&quot;没用过某个技术&quot;，而是当时想明白了、过几个月又忘了的那些判断。 排查一次线上告警时，你可能是这样得出结论的： 这个接口的 P99 高，不是慢 SQL，是连接池等待。因为 DB 侧的活跃连接数一直没打满，而应用侧的获取连接耗时占了请求时间的 80%。 结论很清晰，但三个月后遇到同类问题，你可能又要从&quot;Druid 监控在哪看&quot;开始重新推一遍。博客对我最大的价值，就是把这些推理链条固化下来。 官方文档回答&quot;这个 API 是什么&quot;，而我想记录的是&quot;在什么约束下我选择了它&quot;。 这里准备写什么# 大致会覆盖这几条线，优先级从高到低： Java 与 JVM：GC 日志、内存模型、并发工具、性能排查分布式系统：消息队列、分布式事务、一致性、幂等设计数据库：MySQL 索引与执行计划、分库分表、缓存一致性工程实践：可观测性、发布与回滚、故障复盘随笔：读书笔记、工具与工作方法 写作原则只有一条：能复现的才写。涉及具体参数的地方，尽量给出可执行的命令或代码，而不是&quot;建议调大一些&quot;。 这个站点怎么搭的# 站点本身也是我的一次练习：不使用任何框架和 npm 依赖，用 Node.js 写了个约 600 行的静态生成器。 # 写一篇 Markdown，然后构建 node scripts/new-post.mjs &quot;标题&quot; node scripts/build.mjs 目录结构很直白： content/posts/ Markdown 原文 templates/ HTML 模板 scripts/build.mjs 生成器 assets/ CSS / JS / 图片 构建产物是纯静态文件，直接推送到 Gitee 就能用 Pages 托管。没有 Node 环境也能维护，因为生成的 HTML 本身就可以直接改。 关于订阅与反馈# 如果你用 RSS 阅读器，可以订阅 feed.xml；如果发现问题，欢迎在 Gitee 仓库提 Issue。 最后，借用一句常被引用的话作为开篇： 写下来，是为了让未来的自己少走一遍弯路。 希望这里的每一篇，都能在某个时刻帮你省下半小时。"
+  },
+  {
+    "title": "G1 调参实战：从 200ms 停顿到 40ms",
+    "url": "posts/jvm-g1-tuning.html",
+    "date": "2026-08-24",
+    "tags": [
+      "Java",
+      "JVM",
+      "性能"
+    ],
+    "summary": "一次把服务端 G1 的 Young GC 停顿从 200ms 压到 40ms 的过程：先看日志，再定 Region 大小，最后才动参数。",
+    "text": "先别急着调参# 线上服务报 P99 抖动，GC 日志最能说明问题。先让 JVM 把话说清楚： -Xlog:gc*:file=/var/log/app/gc.log:time,uptime,level,tags:filecount=10,filesize=50M 拿到日志后，用这三步定位： 看频率：Young GC 多久一次？如果几秒一次，说明新生代太小或晋升太快看停顿：单次停顿是多少？是否伴随 Mixed GC看回收效果：每次回收后堆占用降了多少？降不下去说明有对象在反复存活 我们这次的现象是：Young GC 平均 180–220ms，每 6 秒一次，堆 16G，MaxGCPauseMillis 默认 200ms。 第一步：确认 Region 大小# G1 把堆切成大小相等的 Region，Region 大小由 -XX:G1HeapRegionSize 决定，未显式设置时 JVM 按堆大小推算： 堆大小默认 Region1G – 2G1M2G – 4G2M4G – 8G4M8G – 16G8M16G – 32G16M32G – 64G32M 16G 堆对应 8M Region，意味着 2000 个 Region。Region 越多，G1 的 Remembered Set 和并发标记的簿记开销越大。 第二步：让停顿目标真正生效# G1 的 MaxGCPauseMillis 是软目标，JVM 会通过调整年轻代大小来逼近它。但有两个坑： -XX:MaxGCPauseMillis=200 # 软目标，不是硬上限 -XX:G1NewSizePercent=5 # 年轻代下限，默认 5% -XX:G1MaxNewSizePercent=60 # 年轻代上限，默认 60% 如果停顿目标设得太小（比如 20ms），G1 会把年轻代压得很小，导致 GC 频率暴涨，吞吐反而下降如果 G1MaxNewSizePercent 太小，年轻代长不大，回收效率上不去 我们先把目标设成 60ms，同时提高年轻代上限： -XX:MaxGCPauseMillis=60 -XX:G1NewSizePercent=10 -XX:G1MaxNewSizePercent=70 第三步：处理晋升压力# 如果对象在新生代活过 15 次回收就被晋升，而实际存活时间更长，会导致老年代快速膨胀、Mixed GC 频繁。 -XX:MaxTenuringThreshold=15 -XX:TargetSurvivorRatio=60 -Xmn 或 -XX:NewRatio # G1 下不要用，会覆盖自适应策略 同时打开并行引用处理，减少并发标记阶段的 STW： -XX:+ParallelRefProcEnabled -XX:+PerfDisableSharedMem 最终参数与结果# XX:+UseG1GC -Xms16g -Xmx16g -XX:MaxGCPauseMillis=60 -XX:G1HeapRegionSize=16m -XX:G1NewSizePercent=10 -XX:G1MaxNewSizePercent=70 -XX:InitiatingHeapOccupancyPercent=40 -XX:+ParallelRefProcEnabled -XX:+AlwaysPreTouch 调整后的观测结果： 指标调整前调整后Young GC 平均停顿200ms38msYoung GC 频率6s/次3.5s/次Mixed GC 频率2 分钟/次8 分钟/次服务 P99320ms95ms 小结# 三个经验： 先量化再动手。GC 日志不骗人，凭感觉调参只会把问题挪个地方停顿目标和年轻代大小是耦合的，改一个必须看另一个G1 下不要用 -Xmn，它会直接压死自适应策略 下一篇准备写 Concurrent Mark 阶段被老年代占满时的排查思路，那部分坑更深。"
+  },
+  {
+    "title": "Kafka 不丢不重的实践清单",
+    "url": "posts/kafka-no-loss.html",
+    "date": "2026-07-19",
+    "tags": [
+      "Kafka",
+      "分布式",
+      "消息队列"
+    ],
+    "summary": "从生产者、Broker 到消费者，把\"消息不丢\"和\"消息不重\"拆成可以逐条检查的清单，并说明为什么端到端恰好一次往往要落到业务幂等上。",
+    "text": "先说结论# 消息系统的可靠性可以拆成两个独立问题： 不丢：靠重试 + 确认机制 + 持久化副本保证不重：靠幂等消费保证，Kafka 自身只能做到分区内的幂等 真正落地的方案，几乎都是&quot;至少一次投递 + 业务侧幂等&quot;。 生产者侧# 关键就三个参数： acks=all retries=2147483647 enable.idempotence=true max.in.flight.requests.per.connection=5 acks=all 要求 ISR 全部确认，配合 min.insync.replicas=2 才有意义enable.idempotence=true 会开启生产者幂等，保证单分区内重试不产生重复开了幂等之后 max.in.flight 可以放到 5，但不能超过 5 发送结果一定要处理，别只 send() 不 get()： producer.send(record, (metadata, exception) -&gt; { if (exception != null) { // 落库重试表 / 告警，绝不能吞掉 log.error(&quot;send failed, key={}&quot;, record.key(), exception); } }); 最常见的&quot;丢消息&quot;其实是业务代码里 try { send } catch (Exception ignored) {}。 Broker 侧# default.replication.factor=3 min.insync.replicas=2 unclean.leader.election.enable=false log.flush.interval.messages=10000 unclean.leader.election.enable=false 是底线：宁可分区不可用，也不让落后的副本当 Leader。 另外注意磁盘水位线，写满时 Broker 会拒绝写入： log.retention.bytes=107374182400 log.retention.hours=168 消费者侧# 消费端是重复消息的主要来源，因为位移提交和业务处理不在同一个事务里。 enable.auto.commit=false isolation.level=read_committed max.poll.records=200 手动提交时的顺序很关键： 1. 拉取消息 2. 业务处理（写库） 3. 处理成功 → commitSync，失败 → 不提交并抛出 如果先提交再处理，进程崩溃就会丢消息；如果处理后提交失败，就会重复消费。既然重复不可避免，就必须做幂等。 幂等消费的三种做法# 方案适用场景代价唯一索引 + 插入忽略单表写入，有天然业务主键需要设计业务主键去重表跨表操作多一次写，需要定期清理Redis SETNX允许极小概率失效存在缓存与库不一致窗口 推荐优先选唯一索引，它由数据库保证，不依赖应用逻辑正确。 -- 以订单号 + 事件类型作为业务唯一键 CREATE UNIQUE INDEX uk_order_event ON order_event (order_no, event_type); // 插入冲突即视为重复消息，直接跳过 try { orderEventMapper.insert(event); } catch (DuplicateKeyException e) { log.warn(&quot;duplicate message, orderNo={}, type={}&quot;, event.getOrderNo(), event.getType()); return; } 消费积压的应急顺序# 先确认是消费慢还是分区不均衡（看 LAG 的分布）消费慢 → 检查是否有同步 RPC、慢 SQL，或 max.poll.interval.ms 过小导致反复 rebalance分区不均衡 → 检查 key 的分布，避免热点 key都不是 → 临时扩消费者实例（不超过分区数）或扩容分区 小结# 一句话总结这套组合拳：生产端不丢，消费端幂等，监控端有滞后告警。 把这三件事做完，消息可靠性的问题就基本收敛了。"
+  },
+  {
+    "title": "从 B+ 树聊 MySQL 索引与最左前缀",
+    "url": "posts/mysql-leftmost-index.html",
+    "date": "2026-06-21",
+    "tags": [
+      "MySQL",
+      "数据库",
+      "索引"
+    ],
+    "summary": "与其背\"最左前缀原则\"，不如搞清楚联合索引在 B+ 树里是怎么排序的。理解了排序规则，索引失效的绝大多数情况都能自己推出来。",
+    "text": "联合索引在树里是怎么排的# 建立联合索引 idx_a_b_c (a, b, c) 时，MySQL 会先按 a 排序，a 相同再按 b 排序，b 相同再按 c 排序。 这一点直接决定了查询能否走索引：只有从最左列开始、连续匹配的等值条件，才能继续利用后面的列。 查询条件能用到索引的列说明a = ?a正常a = ? AND b = ?a, b正常a = ? AND b &gt; ? AND c = ?a, b范围查询后，c 用不上b = ? AND c = ?无缺少最左列 aa = ? AND c = ?a跳过了 b 注意第三行：b &gt; ? 是范围查询，c 就断了。如果业务允许，把 c = ? 提到 b 前面，或者建立 (a, c, b) 的索引会更合适。 EXPLAIN 里真正要看的字段# EXPLAIN SELECT id, a, b, c FROM t_order WHERE a = 1 AND b = 2 ORDER BY c; +----+-------+------+---------------+---------+---------+-------------------+ | id | type | key | key_len | ref | rows | Extra | +----+-------+------+---------------+---------+---------+-------------------+ | 1 | ref | idx | 8 | const | 12 | Using index cond | +----+-------+------+---------------+---------+---------+-------------------+ type：至少要到 range，出现 ALL 基本说明没走索引key：实际使用的索引，NULL 表示没用到key_len：最直接判断&quot;用了几列&quot;的依据。可以反推用了几个索引列Extra：Using index 是覆盖索引，Using filesort 表示排序没走索引，Using temporary 要警惕 key_len 的计算规则简单记成：不包含在 NULL 字段里的索引列会各占一份，varchar 还要加上长度标记字节。 索引失效的常见场景# 对索引列做运算：WHERE date(created_at) = &#39;2026-06-21&#39; 改写为 WHERE created_at &gt;= &#39;2026-06-21&#39; AND created_at &lt; &#39;2026-06-22&#39;隐式类型转换：WHERE phone = 13800000000（phone 是 varchar）会全表扫描前缀模糊匹配：LIKE &#39;%abc&#39; 用不上索引，LIKE &#39;abc%&#39; 可以OR 连接非索引列：任一分支没索引，整体就退化字符集不一致的联表：JOIN 字段字符集不同会触发隐式转换 覆盖索引与回表# 如果查询需要的列都在索引里，就不需要回表查主键： -- 需要回表：索引里只有 a，b，还要取 c 之外的其他列 SELECT * FROM t_order WHERE a = 1 AND b = 2; -- 覆盖索引：c 也在索引中，Extra 会显示 Using index SELECT a, b, c FROM t_order WHERE a = 1 AND b = 2; 这也是为什么 SELECT * 在索引优化时经常碍事——它天然排除了覆盖索引的可能。 怎么选索引顺序# 一个可操作的判断顺序： 等值条件优先，范围条件放后面区分度高的列优先（COUNT(DISTINCT col) / COUNT(*)）考虑排序和分组，让 ORDER BY / GROUP BY 也能复用索引控制索引数量，写多读少的表每个索引都是成本 索引不是越多越好。一个联合索引 (a, b) 已经能被 a = ? 复用，再单独建 (a) 就是冗余。 小结# 不要背&quot;最左前缀&quot;这四个字，而是记住：B+ 树是按索引列顺序逐级比较的，比较一旦不连续，后面的列就用不上。 把这条规则想清楚，EXPLAIN 的结果就不再需要猜了。"
+  },
+  {
+    "title": "ShardingSphere-JDBC 分库分表踩坑记录",
+    "url": "posts/sharding-jdbc-notes.html",
+    "date": "2026-05-16",
+    "tags": [
+      "分库分表",
+      "ShardingSphere",
+      "数据库"
+    ],
+    "summary": "分片键选择、跨分片查询、分布式主键、事务边界——记录一次从单库迁移到 4 库 8 表的完整过程和五个真实踩过的坑。",
+    "text": "背景# 订单表 3 亿行，单表索引已经压不住。目标拆成 4 库 × 8 表，使用 ShardingSphere-JDBC 5.4，业务代码尽量零改动。 坑一：分片键选错，热点集中# 最初按 create_time 分片，结果所有写请求都落在最新那个分片上——新数据的时间总是当前时间。 分片键的选择顺序应该是： 查询条件里必带的字段（避免跨分片广播）分布均匀的字段（避免热点）不随时间倾斜的字段 最终改成 user_id 取模，写入彻底打散。 spring: shardingsphere: rules: sharding: tables: t_order: actual-data-nodes: ds$-&gt;{0..3}.t_order_$-&gt;{0..7} database-strategy: standard: sharding-column: user_id sharding-algorithm-name: db-inline table-strategy: standard: sharding-column: user_id sharding-algorithm-name: table-inline sharding-algorithms: db-inline: type: INLINE props: algorithm-expression: ds$-&gt;{user_id % 4} table-inline: type: INLINE props: algorithm-expression: t_order_$-&gt;{user_id % 8} 坑二：跨分片分页# LIMIT 100000, 20 在分片环境下会被改写成每个分片 LIMIT 0, 100020，内存和网络开销直接爆炸。 三种处理方式： 方案说明适用禁止深分页限制最大翻页数后台管理系统二次查询法用偏移量反查最小 ID需要精确分页游标分页WHERE id &gt; last_id ORDER BY id LIMIT 20推荐，性能最好 我们最后把前台接口全改成游标分页，问题消失。 坑三：分布式主键与索引膨胀# 用 UUID 做主键，B+ 树随机插入，页分裂严重。改用雪花算法： // 雪花 ID 单调递增，且不含业务信息 long id = snowflake.nextId(); 注意雪花算法依赖机器时钟，务必开启时钟回拨保护，否则会生成重复 ID。 坑四：跨库 JOIN 与分布式事务# 分片后 JOIN 只能在同一个分片内进行。跨库查询有三种选择： 冗余字段：把常用的关联字段冗余到订单表（我们选了这条）应用层组装：先查主表再批量查从表广播表：把配置类小表在每个库都放一份 事务方面，跨库写必须用 @ShardingSphereTransactionType(TransactionType.BASE) 或走本地消息表。能在一个分片内完成的事务，就不要跨分片。 坑五：上线顺序# 迁移过程按这个顺序走，每一步都可回滚： 1. 双写（旧表 + 新分片表），以旧表为准 2. 全量迁移历史数据 + 校验行数与抽样比对 3. 读切分片表，观察一周 4. 停止双写，旧表保留只读 5. 清理旧表 第 2 步的数据校验一定要做，我们当时发现 12 万行数据因为时间字段格式问题漏迁，靠抽样比对捞回来的。 小结# 分片键决定架构上限，选错了后面所有优化都是补丁分片后没有免费的 JOIN 和事务，必须在设计阶段就把访问路径想清楚迁移一定要可回滚，双写期越长越安全 分库分表是最后的手段。如果单表两千万行以内、加索引就能解决，别急着拆。"
+  },
+  {
+    "title": "缓存与数据库一致性的四种方案",
+    "url": "posts/redis-cache-consistency.html",
+    "date": "2026-04-12",
+    "tags": [
+      "Redis",
+      "缓存",
+      "分布式"
+    ],
+    "summary": "先删缓存还是先更新数据库？延迟双删到底能不能解决问题？把四种常见方案的失效场景摊开看，结论会清晰很多。",
+    "text": "问题本质# 缓存和数据库是两个存储，任何&quot;先操作 A、再操作 B&quot;的顺序都会有一个中间窗口，窗口内两者不一致。所以真正的问题不是&quot;如何消除不一致&quot;，而是把不一致窗口压到能接受的范围。 方案一：先更新数据库，再删除缓存# 也就是常说的 Cache Aside。绝大多数场景下这是默认选择。 并发下仍有极小概率出错： T1: 读请求，缓存未命中 T2: 读请求，从 DB 读到旧值 v1 T1: 写请求，更新 DB 为 v2，删除缓存 T2: 把 v1 写入缓存 ← 缓存里留下了旧值 这个窗口出现的条件是&quot;读请求恰好在写请求删缓存之后才写回缓存&quot;，概率低但存在。缓解方式： // 写回的缓存加一个较短的过期时间兜底 redis.set(key, value, 60, TimeUnit.SECONDS); 方案二：延迟双删# 更新数据库后，先删一次缓存，延迟几百毫秒再删一次。 public void update(Item item) { itemMapper.updateById(item); redis.delete(key(item.getId())); // 延迟删除，等待可能存在的旧值回填完成 executor.schedule(() -&gt; redis.delete(key(item.getId())), 500, TimeUnit.MILLISECONDS); } 它的效果取决于延迟时间是否大于读请求的耗时，而这个耗时不可控。更稳妥的做法是让更新方在删缓存后等待所有在途读请求结束，但代价是复杂度上升。 结论：延迟双删可以缓解，不能根治。 方案三：先删除缓存，再更新数据库# 这个顺序的问题更大： T1: 写请求，删除缓存 T2: 读请求，缓存未命中，从 DB 读到旧值 v1，写回缓存 T1: 更新 DB 为 v2 ← 缓存里是 v1，DB 里是 v2 不一致窗口比方案一更长，所以不推荐。 方案四：订阅 Binlog 异步刷新# 用 Canal / Debezium 订阅数据库变更，异步删除或更新缓存。 优点： 业务代码不感知缓存，解耦彻底缓存操作可以串行化，避免并发乱序 缺点： 引入额外组件，链路更长存在秒级延迟，不适合强一致场景 这个方案适合缓存数据量大、业务代码难以统一改动的系统。 怎么选# 场景推荐方案普通商品、用户资料先更新 DB 再删缓存 + 过期时间兜底更新频率低、读取极频繁同上，但把过期时间拉长缓存与 DB 需要强一致别用缓存，或改用分布式锁串行化大量历史代码难以改造Binlog 异步刷新 两个容易忽略的细节# 缓存穿透：查询不存在的 key 会直接打到 DB。用空值缓存或布隆过滤器兜住。 // 空值也缓存，但过期时间要短 if (item == null) { redis.set(key, &quot;NULL&quot;, 60, TimeUnit.SECONDS); return null; } 热点 key 失效：大批 key 同时过期会造成 DB 尖峰。给过期时间加随机抖动： int ttl = 300 + ThreadLocalRandom.current().nextInt(60); redis.set(key, value, ttl, TimeUnit.SECONDS); 小结# 缓存一致性没有银弹。承认存在不一致窗口，然后用过期时间和兜底逻辑把影响控制住，比追求&quot;绝对一致&quot;更现实。 如果业务真的不能容忍任何不一致，那首先要质疑的应该是：这份数据真的需要放进缓存吗？"
+  }
+]

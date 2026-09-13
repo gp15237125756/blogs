@@ -1,0 +1,35 @@
+  <div class="wrap post-layout">
+    <article class="post">
+      <header class="post-header">
+        <p class="post-meta">
+          <time datetime="{{dateISO}}">{{dateText}}</time>
+          <span class="sep">·</span>
+          <span>{{readingTime}}</span>
+        </p>
+        <h1 class="post-title">{{title}}</h1>
+        <p class="post-summary">{{summary}}</p>
+        <ul class="tag-list">
+{{tagsHtml}}
+        </ul>
+      </header>
+
+      <div class="post-body" id="post-body">
+{{content}}
+      </div>
+
+      <footer class="post-footer">
+        <p class="post-copyright">
+          本文由 {{author}} 创作，采用
+          <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/deed.zh" target="_blank" rel="noopener noreferrer">CC BY-NC-SA 4.0</a>
+          许可协议。转载请注明出处。
+        </p>
+        <nav class="post-nav" aria-label="上下篇导航">
+{{prevNextHtml}}
+        </nav>
+      </footer>
+    </article>
+
+    <aside class="post-aside">
+{{tocHtml}}
+    </aside>
+  </div>

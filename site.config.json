@@ -1,0 +1,13 @@
+{
+  "title": "Odette 的博客",
+  "tagline": "后端开发 / Java / 分布式",
+  "author": "Odette",
+  "description": "记录后端开发路上的思考与实践：Java、分布式系统、数据库与中间件。",
+  "url": "https://odetteisgorgeous.gitee.io/blogs",
+  "repo": "https://gitee.com/odetteisgorgeous/blogs",
+  "email": "1207795768@qq.com",
+  "lang": "zh-CN",
+  "heroTitle": "你好，我是 Odette",
+  "heroSub": "这里记录我在 Java 后端、分布式系统与中间件上踩过的坑，以及想明白的那些事。文章尽量讲清「为什么」和「怎么做」，而不只是贴一个结论。",
+  "homePostCount": 6
+}

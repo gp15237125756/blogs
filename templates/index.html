@@ -1,0 +1,24 @@
+  <section class="hero">
+    <div class="wrap hero-inner">
+      <img class="hero-avatar" src="{{base}}assets/img/avatar.svg" alt="{{author}} 的头像" width="104" height="104" />
+      <div class="hero-text">
+        <h1>{{heroTitle}}</h1>
+        <p>{{heroSub}}</p>
+        <p class="hero-actions">
+          <a class="btn btn-primary" href="{{base}}archive.html">浏览全部文章</a>
+          <a class="btn" href="{{base}}feed.xml">订阅 RSS</a>
+        </p>
+      </div>
+    </div>
+  </section>
+
+  <section class="wrap section">
+    <div class="section-head">
+      <h2>最新文章</h2>
+      <span class="muted">共 {{postCount}} 篇</span>
+    </div>
+    <div class="post-list">
+{{postsHtml}}
+    </div>
+    <p class="more-link"><a href="{{base}}archive.html">查看全部文章 →</a></p>
+  </section>
