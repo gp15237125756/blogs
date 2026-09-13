@@ -17,6 +17,15 @@
       <description>在官方文档、AI 助手和问答社区都很发达的 2026 年，为什么还要自己搭一个静态博客？这篇说说我的理由，以及这里准备写哪些内容。</description>
     </item>
     <item>
+      <title>开博第一篇：这个博客写什么</title>
+      <link>https://odetteisgorgeous.gitee.io/blogs/posts/怎样用AI做好产品.html</link>
+      <guid isPermaLink="true">https://odetteisgorgeous.gitee.io/blogs/posts/怎样用AI做好产品.html</guid>
+      <pubDate>Sun, 13 Sep 2026 00:00:00 GMT</pubDate>
+      <category>AI</category>
+      <category>产品设计</category>
+      <description>产品设计</description>
+    </item>
+    <item>
       <title>G1 调参实战：从 200ms 停顿到 40ms</title>
       <link>https://odetteisgorgeous.gitee.io/blogs/posts/jvm-g1-tuning.html</link>
       <guid isPermaLink="true">https://odetteisgorgeous.gitee.io/blogs/posts/jvm-g1-tuning.html</guid>

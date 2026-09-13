@@ -4,14 +4,14 @@
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>开博第一篇：这个博客写什么 · Odette 的博客</title>
-  <meta name="description" content="在官方文档、AI 助手和问答社区都很发达的 2026 年，为什么还要自己搭一个静态博客？这篇说说我的理由，以及这里准备写哪些内容。" />
+  <meta name="description" content="产品设计" />
   <meta name="author" content="Odette" />
-  <link rel="canonical" href="https://odetteisgorgeous.gitee.io/blogs/posts/hello-world.html" />
+  <link rel="canonical" href="https://odetteisgorgeous.gitee.io/blogs/posts/怎样用AI做好产品.html" />
   <meta property="og:site_name" content="Odette 的博客" />
   <meta property="og:title" content="开博第一篇：这个博客写什么 · Odette 的博客" />
-  <meta property="og:description" content="在官方文档、AI 助手和问答社区都很发达的 2026 年，为什么还要自己搭一个静态博客？这篇说说我的理由，以及这里准备写哪些内容。" />
+  <meta property="og:description" content="产品设计" />
   <meta property="og:type" content="article" />
-  <meta property="og:url" content="https://odetteisgorgeous.gitee.io/blogs/posts/hello-world.html" />
+  <meta property="og:url" content="https://odetteisgorgeous.gitee.io/blogs/posts/怎样用AI做好产品.html" />
   <meta name="twitter:card" content="summary" />
   <meta name="theme-color" content="#f7f8fb" media="(prefers-color-scheme: light)" />
   <meta name="theme-color" content="#0e1116" media="(prefers-color-scheme: dark)" />
@@ -89,47 +89,29 @@
         <p class="post-meta">
           <time datetime="2026-09-13">2026-09-13</time>
           <span class="sep">·</span>
-          <span>2 分钟阅读</span>
+          <span>1 分钟阅读</span>
         </p>
         <h1 class="post-title">开博第一篇：这个博客写什么</h1>
-        <p class="post-summary">在官方文档、AI 助手和问答社区都很发达的 2026 年，为什么还要自己搭一个静态博客？这篇说说我的理由，以及这里准备写哪些内容。</p>
+        <p class="post-summary">产品设计</p>
         <ul class="tag-list">
-          <li><a class="tag" href="../tags.html#tag-随笔">#随笔</a></li>
-          <li><a class="tag" href="../tags.html#tag-博客">#博客</a></li>
+          <li><a class="tag" href="../tags.html#tag-ai">#AI</a></li>
+          <li><a class="tag" href="../tags.html#tag-产品设计">#产品设计</a></li>
         </ul>
       </header>
 
       <div class="post-body" id="post-body">
-<h2 id="为什么还要写博客">为什么还要写博客<a class="anchor" href="#为什么还要写博客" aria-hidden="true">#</a></h2>
-<p>工作几年之后会发现，真正让人反复踩坑的往往不是&quot;没用过某个技术&quot;，而是<strong>当时想明白了、过几个月又忘了</strong>的那些判断。</p>
-<p>排查一次线上告警时，你可能是这样得出结论的：</p>
-<blockquote>
-<p>这个接口的 P99 高，不是慢 SQL，是连接池等待。因为 DB 侧的活跃连接数一直没打满，而应用侧的获取连接耗时占了请求时间的 80%。</p>
-</blockquote>
-<p>结论很清晰，但三个月后遇到同类问题，你可能又要从&quot;Druid 监控在哪看&quot;开始重新推一遍。博客对我最大的价值，就是把这些<strong>推理链条</strong>固化下来。</p>
-<p>官方文档回答&quot;这个 API 是什么&quot;，而我想记录的是&quot;在什么约束下我选择了它&quot;。</p>
-<h2 id="这里准备写什么">这里准备写什么<a class="anchor" href="#这里准备写什么" aria-hidden="true">#</a></h2>
-<p>大致会覆盖这几条线，优先级从高到低：</p>
-<ol><li><strong>Java 与 JVM</strong>：GC 日志、内存模型、并发工具、性能排查</li><li><strong>分布式系统</strong>：消息队列、分布式事务、一致性、幂等设计</li><li><strong>数据库</strong>：MySQL 索引与执行计划、分库分表、缓存一致性</li><li><strong>工程实践</strong>：可观测性、发布与回滚、故障复盘</li><li><strong>随笔</strong>：读书笔记、工具与工作方法</li></ol>
-<p>写作原则只有一条：<strong>能复现的才写</strong>。涉及具体参数的地方，尽量给出可执行的命令或代码，而不是&quot;建议调大一些&quot;。</p>
-<h2 id="这个站点怎么搭的">这个站点怎么搭的<a class="anchor" href="#这个站点怎么搭的" aria-hidden="true">#</a></h2>
-<p>站点本身也是我的一次练习：不使用任何框架和 npm 依赖，用 Node.js 写了个约 600 行的静态生成器。</p>
-<div class="code-block" data-lang="bash"><pre><code class="language-bash"># 写一篇 Markdown，然后构建
-node scripts/new-post.mjs &quot;标题&quot;
-node scripts/build.mjs</code></pre></div>
-<p>目录结构很直白：</p>
-<div class="code-block"><pre><code>content/posts/    Markdown 原文
-templates/        HTML 模板
-scripts/build.mjs 生成器
-assets/           CSS / JS / 图片</code></pre></div>
-<p>构建产物是纯静态文件，直接推送到 Gitee 就能用 Pages 托管。没有 Node 环境也能维护，因为生成的 HTML 本身就可以直接改。</p>
-<h2 id="关于订阅与反馈">关于订阅与反馈<a class="anchor" href="#关于订阅与反馈" aria-hidden="true">#</a></h2>
-<p>如果你用 RSS 阅读器，可以订阅 <a href="../feed.xml">feed.xml</a>；如果发现问题，欢迎在 Gitee 仓库提 Issue。</p>
-<p>最后，借用一句常被引用的话作为开篇：</p>
-<blockquote>
-<p>写下来，是为了让未来的自己少走一遍弯路。</p>
-</blockquote>
-<p>希望这里的每一篇，都能在某个时刻帮你省下半小时。</p>
+<h2 id="如何使用ai工具设计产品">如何使用AI工具设计产品<a class="anchor" href="#如何使用ai工具设计产品" aria-hidden="true">#</a></h2>
+<p>1.环境配置</p>
+<p>配置git环境</p>
+<p>创建AGENT.md，内容包括：</p>
+<p>（1）每次修改代码后提交。</p>
+<p>（2）每次修改代码后测试，确保测试通过</p>
+<h2 id="生成产品设计文档和demo">生成产品设计文档和demo<a class="anchor" href="#生成产品设计文档和demo" aria-hidden="true">#</a></h2>
+<p>先确认产品设计符合要求，使用demo验证</p>
+<h2 id="技术设计文档">技术设计文档<a class="anchor" href="#技术设计文档" aria-hidden="true">#</a></h2>
+<p>生成技术设计文档，确保符合预期</p>
+<h2 id="生成代码和检查">生成代码和检查<a class="anchor" href="#生成代码和检查" aria-hidden="true">#</a></h2>
+<p>生成最终代码，确保测试通过</p>
       </div>
 
       <footer class="post-footer">
@@ -139,7 +121,8 @@ assets/           CSS / JS / 图片</code></pre></div>
           许可协议。转载请注明出处。
         </p>
         <nav class="post-nav" aria-label="上下篇导航">
-          <a class="nav-next" href="../posts/怎样用AI做好产品.html"><span class="nav-label">下一篇 →</span>开博第一篇：这个博客写什么</a>
+          <a class="nav-prev" href="../posts/hello-world.html"><span class="nav-label">← 上一篇</span>开博第一篇：这个博客写什么</a>
+          <a class="nav-next" href="../posts/jvm-g1-tuning.html"><span class="nav-label">下一篇 →</span>G1 调参实战：从 200ms 停顿到 40ms</a>
         </nav>
       </footer>
     </article>
@@ -148,10 +131,10 @@ assets/           CSS / JS / 图片</code></pre></div>
       <nav class="toc" aria-label="文章目录">
         <p class="toc-title">目录</p>
         <ul>
-          <li class="toc-lv2"><a href="#为什么还要写博客">为什么还要写博客</a></li>
-          <li class="toc-lv2"><a href="#这里准备写什么">这里准备写什么</a></li>
-          <li class="toc-lv2"><a href="#这个站点怎么搭的">这个站点怎么搭的</a></li>
-          <li class="toc-lv2"><a href="#关于订阅与反馈">关于订阅与反馈</a></li>
+          <li class="toc-lv2"><a href="#如何使用ai工具设计产品">如何使用AI工具设计产品</a></li>
+          <li class="toc-lv2"><a href="#生成产品设计文档和demo">生成产品设计文档和demo</a></li>
+          <li class="toc-lv2"><a href="#技术设计文档">技术设计文档</a></li>
+          <li class="toc-lv2"><a href="#生成代码和检查">生成代码和检查</a></li>
         </ul>
       </nav>
     </aside>
